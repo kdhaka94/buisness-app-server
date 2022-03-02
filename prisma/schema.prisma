@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mobileNumber String @unique
+  password     String
+
+  email String @unique
+
+  tradeName   String
+  designation String
+
+  gstNumber String @unique
+  panNumber String @unique
+
+  typeOfBuisness    String
+  startYear         String
+  addressOfBuisness String
+}
+
+model GstNumber {
+  id         Int      @id @map("_id")
+  capturedAt DateTime @default(now())
+
+  legalNameOfBuisness          String
+  tradeName                    String
+  effactiveDateOfRegistration  String
+  constitutionOfBuisness       String
+  GSTIN_status                 String
+  taxpayerType                 String
+  adminOffice                  String
+  otherOffice                  String
+  principalPlaceOfBuisness     String
+  isAadhaarAuthenticated       Boolean
+  isEycVerified                Boolean
+  natureOfCoreBuisnessActivity String
+  natureOfBuisnessActivities   String[]
+}
