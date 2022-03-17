@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @map("_id")
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -23,18 +23,27 @@ model User {
 
   tradeName   String
   designation String
-
-  gstNumber String @unique
-  panNumber String @unique
+  // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
+  gstNumber   String @unique
+  panNumber   String @unique
 
   typeOfBuisness    String
   startYear         String
   addressOfBuisness String
+
+  isBlocked  Boolean @default(false)
+  reportedBy User[]  @relation("RUserToUser")
+
+  gstNumberId     String
+  RUser           User?   @relation("RUserToUser", fields: [reportingUserId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  reportingUserId String? @db.ObjectId
+  @@map("Users")
 }
 
 model GstNumber {
-  id         Int      @id @map("_id")
-  capturedAt DateTime @default(now())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  gstNumberId String   @unique
+  capturedAt  DateTime @default(now())
 
   legalNameOfBuisness          String
   tradeName                    String
@@ -49,4 +58,7 @@ model GstNumber {
   isEycVerified                Boolean
   natureOfCoreBuisnessActivity String
   natureOfBuisnessActivities   String[]
+
+  // User User[]
+  @@map("GstNumbers")
 }
