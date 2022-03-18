@@ -23,7 +23,8 @@ export class AuthService {
         mobileNumber: true,
         createdAt: true,
         gstNumber: true,
-        password: true
+        password: true,
+        name: true
       }
     })
 
@@ -90,12 +91,14 @@ export class AuthService {
           email: true,
           mobileNumber: true,
           createdAt: true,
-          gstNumber: true
+          gstNumber: true,
+          name: true
         }
       })
 
       // return the record of the user
-      return user;
+      // return user;
+      return this.signToken(user.id, user.mobileNumber);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
