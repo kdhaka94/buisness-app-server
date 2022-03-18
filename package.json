@@ -5,6 +5,10 @@
   "author": "Kuldeep Dhaka",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "npm": ">=6.0.0",
+    "node": ">=10.0.0"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "postinstall": "npm run prestart:prod",
