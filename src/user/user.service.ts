@@ -11,7 +11,9 @@ export class UserService {
   async searchUser(dto: SearchUserDto) {
     const users = await this.prisma.user.findMany({
       where: {
-        [dto.selectionBy]: dto.selectionId
+        [dto.selectionBy]: {
+          contains: dto.selectionId
+        }
       },
       select: {
         addressOfBuisness: true,
@@ -22,6 +24,7 @@ export class UserService {
         mobileNumber: true,
         typeOfBuisness: true,
         tradeName: true,
+        id: true
       }
     })
 
@@ -63,6 +66,7 @@ export class UserService {
         mobileNumber: true,
         typeOfBuisness: true,
         tradeName: true,
+        id: true,
         reportedBy: {
           select: {
             id: true,
@@ -80,7 +84,7 @@ export class UserService {
         id: currentUser.sub
       }
     })
-    
+
     delete me.password;
 
     return me
