@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReportUserDto, SearchUserDto } from './dto';
 
@@ -31,7 +32,7 @@ export class UserService {
     return users;
   }
 
-  async reportUser(dto: ReportUserDto) {
+  async reportUser(dto: ReportUserDto, currentUser: any) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: dto.userId
@@ -49,7 +50,7 @@ export class UserService {
       data: {
         reportedBy: {
           connect: {
-            id: dto.userId
+            id: currentUser.sub
           }
         }
       },
@@ -72,5 +73,16 @@ export class UserService {
       }
     })
     return updatedUser;
+  }
+  async getMe(currentUser: any) {
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub
+      }
+    })
+    
+    delete me.password;
+
+    return me
   }
 }
