@@ -25,7 +25,7 @@ export class UserService {
         typeOfBuisness: true,
         tradeName: true,
         id: true,
-        name: true
+        username: true
       }
     })
 
@@ -68,7 +68,7 @@ export class UserService {
         typeOfBuisness: true,
         tradeName: true,
         id: true,
-        name: true,
+        username: true,
         reportedBy: {
           select: {
             id: true,

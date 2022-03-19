@@ -24,7 +24,7 @@ export class AuthService {
         createdAt: true,
         gstNumber: true,
         password: true,
-        name: true
+        username: true
       }
     })
 
@@ -92,7 +92,7 @@ export class AuthService {
           mobileNumber: true,
           createdAt: true,
           gstNumber: true,
-          name: true
+          username: true
         }
       })
 
