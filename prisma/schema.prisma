@@ -18,7 +18,7 @@ model User {
 
   mobileNumber String @unique
   password     String
-  name         String @default("")
+  username         String @default("Kuldeep")
 
   email String @unique
 
