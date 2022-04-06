@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
+import axios, { AxiosRequestConfig } from 'axios';
 import { ValidationError } from 'class-validator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SignInDto, SignUpDto } from './dto';
@@ -75,11 +76,33 @@ export class AuthService {
       }
     })
     // check if gst number is found
-    if (!gstNumber) {
-      throw new HttpException("GST Number not found in our database.", HttpStatus.CONFLICT)
-    }
 
-    dto.gstNumberId = gstNumber.id;
+    // const options: AxiosRequestConfig = {
+    //   method: 'POST',
+    //   url: 'https://gst-details2.p.rapidapi.com/Gstverifywebsvcv2/Gstverify',
+    //   headers: {
+    //     'content-type': 'application/x-www-form-urlencoded',
+    //     'x-rapidapi-host': 'gst-details2.p.rapidapi.com',
+    //     'x-rapidapi-key': 'xwSZCh0rpqmshHJa3SoRlmzInVm5p1wDCeCjsnqRsLMSyZIi9q'
+    //   },
+    //   data: {
+    //     clientid: '111',
+    //     txn_id: '2254545',
+    //     consent: 'Y',
+    //     gstnumber: dto.gstNumber,
+    //     method: 'gstvalidate'
+    //   }
+    // };
+
+    // const gstData = await axios.request(options)
+    // console.log({ gstData: gstData })
+    // return gstData.data;
+
+    // if (!gstNumber) {
+    //   throw new HttpException("GST Number not found in our database.", HttpStatus.CONFLICT)
+    // }
+
+    dto.gstNumberId = gstNumber.id || '';
     // save user to db
     try {
       const user = await this.prisma.user.create({
@@ -111,3 +134,8 @@ export class AuthService {
 
   }
 }
+
+
+
+
+
