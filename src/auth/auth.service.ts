@@ -70,11 +70,11 @@ export class AuthService {
     dto.password = hash;
 
     // check for the gst number
-    const gstNumber = await this.prisma.gstNumber.findFirst({
-      where: {
-        gstNumberId: dto.gstNumber
-      }
-    })
+    // const gstNumber = await this.prisma.gstNumber.findFirst({
+    //   where: {
+    //     gstNumberId: dto.gstNumber
+    //   }
+    // })
     // check if gst number is found
 
     // const options: AxiosRequestConfig = {
@@ -102,7 +102,7 @@ export class AuthService {
     //   throw new HttpException("GST Number not found in our database.", HttpStatus.CONFLICT)
     // }
 
-    dto.gstNumberId = gstNumber.id || '';
+    dto.gstNumberId = '';
     // save user to db
     try {
       const user = await this.prisma.user.create({
@@ -125,7 +125,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken')
+          throw new ForbiddenException('Credentials taken');
         }
       }
       throw error;
