@@ -107,6 +107,8 @@ export class UserService {
     paytmParams["TXN_AMOUNT"] = '100';
     paytmParams["WEBSITE"] = 'WEBSTAGING';
     paytmParams["CUST_ID"] = "USER_" + me.id
+    paytmParams["EMAIL"] = me.email;
+    paytmParams["MOBILE_NUMBER"] = "987654310"
 
     const paytmChecksum = await PaytmChecksum.generateSignature(paytmParams, "EpUQGhs_2whyCGPy");
     const verifyChecksum = await PaytmChecksum.verifySignature(paytmParams, "EpUQGhs_2whyCGPy", paytmChecksum);
