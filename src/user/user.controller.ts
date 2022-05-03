@@ -27,4 +27,9 @@ export class UserController {
   paymentToken(@Req() { user }: Request) {
     return this.userService.getPaymentToken(user);
   }
+
+  @Post('verifyPayment')
+  verifyPayment(@Req() { user }: Request) {
+    return this.userService.verifyPayment(user);
+  }
 }

@@ -18,15 +18,15 @@ model User {
 
   mobileNumber String @unique
   password     String
-  username         String @default("Kuldeep")
+  username     String @default("Kuldeep")
 
-  email String @unique
-
-  tradeName   String
-  designation String
+  email         String  @unique
+  isPaymentDone Boolean @default(false)
+  tradeName     String
+  designation   String
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
-  gstNumber   String @unique
-  panNumber   String @unique
+  gstNumber     String  @unique
+  panNumber     String  @unique
 
   typeOfBuisness    String
   startYear         String

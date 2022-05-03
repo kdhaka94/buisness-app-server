@@ -121,5 +121,17 @@ export class UserService {
     }
     throw new ForbiddenException("Failed to generate checksum")
   }
+
+  async verifyPayment(currentUser: any) {
+    const me = await this.prisma.user.update({
+      where: {
+        id: currentUser.sub
+      },
+      data: {
+        isPaymentDone: true
+      }
+    })
+    return me;
+  }
 }
 
