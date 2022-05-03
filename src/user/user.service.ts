@@ -103,7 +103,7 @@ export class UserService {
 
     let paytmParams = {};
     paytmParams["MID"] = "DGgeEm22265131278555";
-    paytmParams["ORDERID"] = "ORDER_" + me.id + "_" + randomUUID();
+    paytmParams["ORDERID"] = randomUUID();
     paytmParams["TXN_AMOUNT"] = '100';
     paytmParams["WEBSITE"] = 'WEBSTAGING';
     paytmParams["CUST_ID"] = "USER_" + me.id
