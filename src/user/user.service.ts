@@ -1,8 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ReportUserDto, SearchUserDto } from './dto';
-
+import { PaytmChecksum } from './paytm/checksum'
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {
@@ -91,4 +92,34 @@ export class UserService {
 
     return me
   }
+
+  async getPaymentToken(currentUser: any): Promise<any> {
+
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub
+      }
+    })
+
+    let paytmParams = {};
+    paytmParams["MID"] = "DGgeEm22265131278555";
+    paytmParams["ORDERID"] = "ORDER_" + me.id + "_" + randomUUID();
+    paytmParams["TXN_AMOUNT"] = '100';
+    paytmParams["WEBSITE"] = 'WEBSTAGING';
+    paytmParams["CUST_ID"] = "USER_" + me.id
+
+    const paytmChecksum = await PaytmChecksum.generateSignature(paytmParams, "EpUQGhs_2whyCGPy");
+    const verifyChecksum = await PaytmChecksum.verifySignature(paytmParams, "EpUQGhs_2whyCGPy", paytmChecksum);
+
+    console.log({ paytmChecksum, paytmParams, verifyChecksum })
+
+    if (verifyChecksum) {
+      return {
+        ...paytmParams,
+        CHECKSUMHASH: paytmChecksum
+      };
+    }
+    throw new ForbiddenException("Failed to generate checksum")
+  }
 }
+

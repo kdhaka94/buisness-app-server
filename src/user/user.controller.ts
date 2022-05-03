@@ -22,4 +22,9 @@ export class UserController {
   getMe(@Req() { user }: Request) {
     return this.userService.getMe(user)
   }
+
+  @Post('paymentToken')
+  paymentToken(@Req() { user }: Request) {
+    return this.userService.getPaymentToken(user);
+  }
 }
