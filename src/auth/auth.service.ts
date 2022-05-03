@@ -25,7 +25,8 @@ export class AuthService {
         createdAt: true,
         gstNumber: true,
         password: true,
-        username: true
+        username: true,
+        isPaymentDone: true
       }
     })
 
@@ -115,7 +116,8 @@ export class AuthService {
           mobileNumber: true,
           createdAt: true,
           gstNumber: true,
-          username: true
+          username: true,
+          isPaymentDone: true
         }
       })
 
