@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Post('verifyPayment')
-  verifyPayment(@Req() { user }: Request) {
-    return this.userService.verifyPayment(user);
+  verifyPayment(@Req() { user, body }: Request) {
+    return this.userService.verifyPayment(user, body.data);
   }
 }

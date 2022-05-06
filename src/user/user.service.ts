@@ -50,7 +50,6 @@ export class UserService {
     if (!user) {
       throw new ForbiddenException("No user found with this data")
     }
-
     const updatedUser = await this.prisma.user.update({
       where: {
         id: dto.userId
@@ -165,6 +164,8 @@ export class UserService {
       })
 
 
+
+
       paytmData.body = paytmParams.body;
       paytmData.head = paytmParams.head;
       paytmData.response = res;
@@ -216,7 +217,7 @@ export class UserService {
     post_req.write(post_data);
     post_req.end();
   }
-  async verifyPayment(currentUser: any) {
+  async verifyPayment(currentUser: any, data: any) {
     const me = await this.prisma.user.update({
       where: {
         id: currentUser.sub
@@ -225,7 +226,12 @@ export class UserService {
         isPaymentDone: true
       }
     })
-    return me;
+    const payment = await this.prisma.payment.create({
+      data: {
+        data
+      }
+    })
+    return payment;
   }
 }
 

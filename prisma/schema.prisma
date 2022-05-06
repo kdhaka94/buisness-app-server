@@ -63,3 +63,13 @@ model GstNumber {
   // User User[]
   @@map("GstNumbers")
 }
+
+model Payment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  data Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  @@map("Payments")
+}
