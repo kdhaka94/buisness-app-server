@@ -3,7 +3,7 @@ import { User } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { delay } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ReportUserDto, SearchUserDto } from './dto';
+import { MerchantInfoDto, ReportUserDto, SearchUserDto } from './dto';
 // import { PaytmChecksum } from './paytm/checksum'
 const https = require('https');
 const PaytmChecksum = require('paytmchecksum');
@@ -83,12 +83,112 @@ export class UserService {
     })
     return updatedUser;
   }
+
+  async blockUser(dto: ReportUserDto, currentUser: any) {
+    const me =  await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub
+      }
+    })
+    if(!me.isAdmin){
+      throw new ForbiddenException("Not authorized")
+    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: dto.userId
+      }
+    })
+
+    if (!user) {
+      throw new ForbiddenException("No user found with this data")
+    }
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: dto.userId
+      },
+      data: {
+        isBlocked:true 
+      },
+      select: {
+        addressOfBuisness: true,
+        designation: true,
+        gstNumber: true,
+        email: true,
+        panNumber: true,
+        mobileNumber: true,
+        typeOfBuisness: true,
+        tradeName: true,
+        id: true,
+        username: true,
+        reportedBy: {
+          select: {
+            id: true,
+            mobileNumber: true,
+            email: true
+          }
+        }
+      }
+    })
+    return updatedUser;
+  }
+  async unblockUser(dto: ReportUserDto, currentUser: any) {
+    const me =  await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub
+      }
+    })
+    if(!me.isAdmin){
+      throw new ForbiddenException("Not authorized")
+    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: dto.userId
+      }
+    })
+
+    if (!user) {
+      throw new ForbiddenException("No user found with this data")
+    }
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: dto.userId
+      },
+      data: {
+        isBlocked:false 
+      },
+      select: {
+        addressOfBuisness: true,
+        designation: true,
+        gstNumber: true,
+        email: true,
+        panNumber: true,
+        mobileNumber: true,
+        typeOfBuisness: true,
+        tradeName: true,
+        id: true,
+        username: true,
+        reportedBy: {
+          select: {
+            id: true,
+            mobileNumber: true,
+            email: true
+          }
+        }
+      }
+    })
+    return updatedUser;
+  }
+
   async getMe(currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
         id: currentUser.sub
       }
     })
+    if(me.isBlocked){
+      throw new ForbiddenException("Your accound has been blocked")
+
+    }
 
     delete me.password;
 
@@ -112,14 +212,16 @@ export class UserService {
     try {
       let paytmParams: any = { body: {}, head: {} };
 
+      const paymentInfo = await this.prisma.merchantInfo.findFirst({})
+
       paytmParams.body = ((orderId = randomUUID()) => ({
         "requestType": "Payment",
-        "mid": "DGgeEm22265131278555",
-        "websiteName": "YOUR_WEBSITE_NAME",
+        "mid": paymentInfo.mid,
+        "websiteName": paymentInfo.websiteName || "YOUR_WEBSITE_NAME",
         "orderId": orderId,
         "callbackUrl": "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=" + orderId,
         "txnAmount": {
-          "value": "1.00",
+          "value": paymentInfo.amount,
           "currency": "INR",
         },
         "userInfo": {
@@ -134,7 +236,7 @@ export class UserService {
 
       let paytmData = { body: {}, head: {}, response: {} }
 
-      const checksum = await PaytmChecksum.generateSignature(JSON.stringify(paytmParams.body), "EpUQGhs_2whyCGPy")
+      const checksum = await PaytmChecksum.generateSignature(JSON.stringify(paytmParams.body), paymentInfo.mkey)
 
       paytmParams.head = {
         "signature": checksum
@@ -228,10 +330,87 @@ export class UserService {
     })
     const payment = await this.prisma.payment.create({
       data: {
-        data
+        data,
+
       }
     })
     return payment;
+  }
+
+  async getAllUsers(currentUser:any){
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub
+      }
+    })
+    if(!me.isAdmin){
+      throw new ForbiddenException("Not authorized")
+    }
+    const users  = await this.prisma.user.findMany({select:{
+      id:true,
+      isAdmin:true,
+      isBlocked:true,
+      isPaymentDone:true,
+      username:true,
+      reportedBy:{
+        select:{
+          username:true,
+          mobileNumber:true
+        }
+      },
+      email:true,
+      gstNumber:true,
+      createdAt:true,
+      panNumber:true,
+      tradeName:true,
+      mobileNumber:true,
+    }});
+    return users;
+  }
+
+  async setPaymentInfo(info:MerchantInfoDto,currentUser:any){
+    const me = await  this.prisma.user.findUnique({
+      where:{
+        id:currentUser.sub
+      }
+    })
+
+
+    if(!me.isAdmin) {
+      throw new ForbiddenException("Not authorized")
+    }
+
+    const data = await this.prisma.merchantInfo.update({
+      where:{
+        id:'6277f4898e229524a7d86d44'
+      },
+      data:{
+        ...info
+      }
+    })
+    return data;
+
+
+  }
+  async getPaymentInfo(currentUser:any){
+    const me = await  this.prisma.user.findUnique({
+      where:{
+        id:currentUser.sub
+      }
+    })
+
+
+    if(!me.isAdmin) {
+      throw new ForbiddenException("Not authorized")
+    }
+
+    const data = await this.prisma.merchantInfo.findFirst({
+      where:{
+        id:'6277f4898e229524a7d86d44'
+      },
+    })
+
+    return data;
   }
 }
 

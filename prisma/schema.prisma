@@ -24,6 +24,7 @@ model User {
   isPaymentDone Boolean @default(false)
   tradeName     String
   designation   String
+  isAdmin       Boolean @default(false)
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
   gstNumber     String  @unique
   panNumber     String  @unique
@@ -65,11 +66,24 @@ model GstNumber {
 }
 
 model Payment {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  data Json
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  data      Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
 
   @@map("Payments")
+}
+
+model MerchantInfo {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  mid         String
+  mkey        String
+  amount      String
+  websiteName String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+
+  @@map("Merchant")
 }

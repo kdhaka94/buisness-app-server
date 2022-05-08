@@ -26,7 +26,8 @@ export class AuthService {
         gstNumber: true,
         password: true,
         username: true,
-        isPaymentDone: true
+        isPaymentDone: true,
+        isBlocked:true
       }
     })
 
@@ -39,7 +40,9 @@ export class AuthService {
     if (!pwMatches) {
       throw new ForbiddenException("Credentials incorrect")
     }
-
+    if(user.isBlocked){
+      throw new ForbiddenException("Your account has been blocked")
+    }
     delete user.password;
 
     // generate a jwt token
