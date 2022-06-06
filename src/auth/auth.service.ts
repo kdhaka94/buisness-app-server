@@ -1,4 +1,10 @@
-import { ForbiddenException, HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -10,13 +16,17 @@ import { SignInDto, SignUpDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService, private config: ConfigService) { }
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
   async signin(dto: SignInDto) {
     // get the user
     const user = await this.prisma.user.findUnique({
       where: {
-        mobileNumber: dto.mobileNumber
+        mobileNumber: dto.mobileNumber,
       },
       select: {
         id: true,
@@ -27,46 +37,42 @@ export class AuthService {
         password: true,
         username: true,
         isPaymentDone: true,
-        isBlocked:true
-      }
-    })
+        isBlocked: true,
+      },
+    });
 
     if (!user) {
-      throw new ForbiddenException("Credentials incorrect")
+      throw new ForbiddenException('Credentials incorrect');
     }
     // match password
-    const pwMatches = await argon.verify(user.password, dto.password)
+    const pwMatches = await argon.verify(user.password, dto.password);
 
     if (!pwMatches) {
-      throw new ForbiddenException("Credentials incorrect")
+      throw new ForbiddenException('Credentials incorrect');
     }
-    if(user.isBlocked){
-      throw new ForbiddenException("Your account has been blocked")
+    if (user.isBlocked) {
+      throw new ForbiddenException('Your account has been blocked');
     }
     delete user.password;
 
     // generate a jwt token
 
     return this.signToken(user.id, user.mobileNumber);
-
   }
   async signToken(userId: string, mobileNumber: string) {
-
     const payload = {
       sub: userId,
-      mobileNumber
-    }
-    const secret = this.config.get("JWT_SECRET")
+      mobileNumber,
+    };
+    const secret = this.config.get('JWT_SECRET');
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '30d',
-      secret
+      secret,
     });
     return {
-      access_token: token
-    }
+      access_token: token,
+    };
   }
-
-
 
   async signup(dto: SignUpDto) {
     // generate hash
@@ -120,9 +126,9 @@ export class AuthService {
           createdAt: true,
           gstNumber: true,
           username: true,
-          isPaymentDone: true
-        }
-      })
+          isPaymentDone: true,
+        },
+      });
 
       // return the record of the user
       // return user;
@@ -135,12 +141,5 @@ export class AuthService {
       }
       throw error;
     }
-
-
   }
 }
-
-
-
-
-

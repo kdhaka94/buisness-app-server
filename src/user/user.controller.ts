@@ -8,36 +8,36 @@ import { UserService } from './user.service';
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @Post('searchUser')
   searchUser(@Body() dto: SearchUserDto, @Req() req: Request) {
-    return this.userService.searchUser(dto)
+    return this.userService.searchUser(dto);
   }
   @Post('reportUser')
   reportUser(@Body() dto: ReportUserDto, @Req() { user }: Request) {
-    return this.userService.reportUser(dto, user)
+    return this.userService.reportUser(dto, user);
   }
   @Post('blockUser')
   blockUser(@Body() dto: ReportUserDto, @Req() { user }: Request) {
-    return this.userService.blockUser(dto, user)
+    return this.userService.blockUser(dto, user);
   }
   @Post('unblockUser')
   unblockUser(@Body() dto: ReportUserDto, @Req() { user }: Request) {
-    return this.userService.unblockUser(dto, user)
+    return this.userService.unblockUser(dto, user);
   }
   @Post('setPaymentInfo')
   setPaymentInfo(@Body() dto: MerchantInfoDto, @Req() { user }: Request) {
-    return this.userService.setPaymentInfo(dto, user)
+    return this.userService.setPaymentInfo(dto, user);
   }
   @Post('getPaymentInfo')
   getPaymentInfo(@Req() { user }: Request) {
-    return this.userService.getPaymentInfo( user)
+    return this.userService.getPaymentInfo(user);
   }
 
   @Post('me')
   getMe(@Req() { user }: Request) {
-    return this.userService.getMe(user)
+    return this.userService.getMe(user);
   }
 
   @Post('paymentToken')
@@ -51,7 +51,7 @@ export class UserController {
   }
 
   @Post('allUsers')
-  allUsers(@Req() { user}: Request) {
+  allUsers(@Req() { user }: Request) {
     return this.userService.getAllUsers(user);
   }
 }

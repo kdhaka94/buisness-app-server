@@ -1,14 +1,10 @@
-import { IsNotEmpty, ValidateIf } from "class-validator"
+import { IsNotEmpty, ValidateIf } from 'class-validator';
 
 export class MerchantInfoDto {
-
   @IsNotEmpty()
-  amount: string
+  amount: string;
   @IsNotEmpty()
-  mid: string
+  mid: string;
   @IsNotEmpty()
-  mkey: string
+  mkey: string;
 }
-
-
-

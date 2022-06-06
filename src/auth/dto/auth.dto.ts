@@ -1,47 +1,37 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class SignInDto {
   @IsNotEmpty()
-  mobileNumber: string
+  mobileNumber: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string
+  password: string;
 }
-
 
 export class SignUpDto {
   @IsNotEmpty()
-  mobileNumber: string
+  mobileNumber: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string
+  password: string;
   @IsNotEmpty()
-  username: string
+  username: string;
 
   @IsEmail()
-  email: string
+  email: string;
+
+  gstNumber: string;
 
   @IsNotEmpty()
-  gstNumber: string
+  tradeName: string;
+  @IsNotEmpty()
+  designation: string;
+  panNumber: string;
+  typeOfBuisness: string;
+  startYear: string;
+  addressOfBuisness: string;
 
-  @IsNotEmpty()
-  tradeName: string
-  @IsNotEmpty()
-  designation: string
-  @IsNotEmpty()
-  panNumber: string
-  @IsNotEmpty()
-  typeOfBuisness: string
-  @IsNotEmpty()
-  startYear: string
-  @IsNotEmpty()
-  addressOfBuisness: string
-
-  gstNumberId: string
+  gstNumberId: string;
 }
-
-
-
-
