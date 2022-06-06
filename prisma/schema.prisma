@@ -26,12 +26,12 @@ model User {
   designation   String
   isAdmin       Boolean @default(false)
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
-  gstNumber     String  @unique
-  panNumber     String  @unique
+  gstNumber     String?  @unique
+  panNumber     String?  @unique
 
-  typeOfBuisness    String
-  startYear         String
-  addressOfBuisness String
+  typeOfBuisness    String?
+  startYear         String?
+  addressOfBuisness String?
 
   isBlocked  Boolean @default(false)
   reportedBy User[]  @relation("RUserToUser")
