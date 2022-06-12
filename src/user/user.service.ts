@@ -202,6 +202,7 @@ export class UserService {
         isPaymentDone: true,
         mobileNumber: true,
         panNumber: true,
+        isAccountVerified: true,
         reportedBy: {
           select: {
             id: true,

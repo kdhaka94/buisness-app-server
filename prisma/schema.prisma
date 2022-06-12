@@ -3,7 +3,6 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["mongoDb"]
 }
 
 datasource db {
@@ -20,14 +19,15 @@ model User {
   password     String
   username     String @default("Kuldeep")
 
-  email         String  @unique
-  isPaymentDone Boolean @default(false)
-  tradeName     String
-  designation   String
-  isAdmin       Boolean @default(false)
+  email             String  @unique
+  isPaymentDone     Boolean @default(false)
+  isAccountVerified Boolean @default(false)
+  tradeName         String
+  designation       String
+  isAdmin           Boolean @default(false)
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
-  gstNumber     String?  @unique
-  panNumber     String?  @unique
+  gstNumber         String? @unique
+  panNumber         String? @unique
 
   typeOfBuisness    String?
   startYear         String?
