@@ -182,12 +182,36 @@ export class UserService {
       where: {
         id: currentUser.sub,
       },
+      select: {
+        addressOfBuisness: true,
+        designation: true,
+        email: true,
+        createdAt: true,
+        gstNumber: true,
+        id: true,
+        isAdmin: true,
+        isBlocked: true,
+        isPaymentDone: true,
+        mobileNumber: true,
+        panNumber: true,
+        reportedBy: {
+          select: {
+            id: true,
+            mobileNumber: true,
+            email: true,
+            gstNumber: true,
+          },
+        },
+        startYear: true,
+        tradeName: true,
+        typeOfBuisness: true,
+        updatedAt: true,
+        username: true,
+      },
     });
     if (me.isBlocked) {
       throw new ForbiddenException('Your accound has been blocked');
     }
-
-    delete me.password;
 
     return me;
   }
@@ -239,7 +263,7 @@ export class UserService {
 
       const checksum = await PaytmChecksum.generateSignature(
         JSON.stringify(paytmParams.body),
-        paymentInfo.mkey,
+        paymentInfo.mkey
       );
 
       paytmParams.head = {
