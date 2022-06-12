@@ -10,7 +10,15 @@ const PaytmChecksum = require('paytmchecksum');
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
-  async searchUser(dto: SearchUserDto) {
+  async searchUser(dto: SearchUserDto, currentUser: any) {
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub,
+      },
+    });
+    if (!me.isPaymentDone) {
+      throw new ForbiddenException('Please complete payment before using this service');
+    }
     const users = await this.prisma.user.findMany({
       where: {
         [dto.selectionBy]: {

@@ -11,8 +11,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('searchUser')
-  searchUser(@Body() dto: SearchUserDto, @Req() req: Request) {
-    return this.userService.searchUser(dto);
+  searchUser(@Body() dto: SearchUserDto, @Req() { user }: Request) {
+    return this.userService.searchUser(dto, user);
   }
   @Post('reportUser')
   reportUser(@Body() dto: ReportUserDto, @Req() { user }: Request) {
