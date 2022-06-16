@@ -254,7 +254,7 @@ export class UserService {
         },
       },
     });
-    return { message: 'Verifed successfully' };
+    return { success_message: 'Verifed successfully' };
   }
 
   async getPaymentToken(currentUser: any): Promise<any> {
@@ -515,6 +515,6 @@ export class UserService {
       },
     });
 
-    return { message: 'OTP Sent!' };
+    return { success_message: 'OTP Sent!' };
   }
 }
