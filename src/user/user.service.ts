@@ -249,6 +249,9 @@ export class UserService {
       },
       data: {
         isAccountVerified: true,
+        verificationInfo: {
+          verifiedAt: new Date(),
+        },
       },
     });
     return { message: 'Verifed successfully' };
