@@ -243,7 +243,7 @@ export class UserService {
       throw new ForbiddenException('Last otp has expired');
     }
 
-    const updated = this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: {
         id: currentUser.sub,
       },
