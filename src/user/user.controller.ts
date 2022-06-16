@@ -49,9 +49,17 @@ export class UserController {
   verifyPayment(@Req() { user, body }: Request) {
     return this.userService.verifyPayment(user, body.data);
   }
+  @Post('verifyMe')
+  verifyMe(@Body() { otp }: { otp: string }, @Req() { user, body }: Request) {
+    return this.userService.verifyMe(otp, user);
+  }
 
   @Post('allUsers')
   allUsers(@Req() { user }: Request) {
     return this.userService.getAllUsers(user);
+  }
+  @Post('sendVerificationCode')
+  sendVerificationCode(@Req() { user }: Request) {
+    return this.userService.sendVerificationCode(user);
   }
 }

@@ -1,9 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import axios from 'axios';
 import { randomUUID } from 'crypto';
 import { delay } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MerchantInfoDto, ReportUserDto, SearchUserDto } from './dto';
+import { v4 as uuidV4 } from 'uuid';
+import { getDifferenceBetweenDates } from './utils/date-time-helper';
 // import { PaytmChecksum } from './paytm/checksum'
 const https = require('https');
 const PaytmChecksum = require('paytmchecksum');
@@ -223,6 +226,32 @@ export class UserService {
     }
 
     return me;
+  }
+  async verifyMe(otp: string, currentUser: any) {
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub,
+      },
+    });
+
+    if (me.verificationInfo.lastOtp != otp) {
+      throw new ForbiddenException('OTP did not match');
+    }
+    const diff = getDifferenceBetweenDates(new Date(me.verificationInfo.lastOtpSentAt), new Date());
+    console.log({ diff });
+    if (diff.mm > 5) {
+      throw new ForbiddenException('Last otp has expired');
+    }
+
+    const updated = this.prisma.user.update({
+      where: {
+        id: currentUser.sub,
+      },
+      data: {
+        isAccountVerified: true,
+      },
+    });
+    return { message: 'Verifed successfully' };
   }
 
   async getPaymentToken(currentUser: any): Promise<any> {
@@ -445,5 +474,44 @@ export class UserService {
     });
 
     return data;
+  }
+  async sendVerificationCode(currentUser: any) {
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub,
+      },
+    });
+    if (me.isAccountVerified) {
+      throw new ForbiddenException('Account already verified');
+    }
+
+    function randomIntFromInterval(min, max) {
+      // min and max included
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    const code = randomIntFromInterval(100000, 999999).toString();
+
+    const codeString = encodeURIComponent(
+      `${code} is your one time password (OTP) for verification at buisnessapp. OTP Count 6 and valid for 5Minutes. Thanks`
+    );
+
+    const response = await axios.get(
+      `https://api.msg91.com/api/sendhttp.php?authkey=336052A8JalNZv761e70f85P1&mobiles=${me.mobileNumber}&message=${codeString}&sender=VHTOTP&route=4&country=91&DLT_TE_ID=1207161600667972200&response=json`
+    );
+
+    const update = await this.prisma.user.update({
+      where: {
+        id: currentUser.sub,
+      },
+      data: {
+        verificationInfo: {
+          lastOtp: code,
+          lastOtpSentAt: new Date(),
+        },
+      },
+    });
+
+    return { message: 'OTP Sent!' };
   }
 }

@@ -2,12 +2,18 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+type VerificationInfoType {
+  verifiedAt    DateTime?
+  lastOtpSentAt DateTime  @default(now())
+  lastOtp       String    @default("")
 }
 
 model User {
@@ -19,15 +25,16 @@ model User {
   password     String
   username     String @default("Kuldeep")
 
-  email             String  @unique
-  isPaymentDone     Boolean @default(false)
-  isAccountVerified Boolean @default(false)
+  email             String                @unique
+  isPaymentDone     Boolean               @default(false)
+  isAccountVerified Boolean               @default(false)
   tradeName         String
+  verificationInfo  VerificationInfoType?
   designation       String
-  isAdmin           Boolean @default(false)
+  isAdmin           Boolean               @default(false)
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
-  gstNumber         String? @unique
-  panNumber         String? @unique
+  gstNumber         String?               @unique
+  panNumber         String?               @unique
 
   typeOfBuisness    String?
   startYear         String?
