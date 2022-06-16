@@ -487,7 +487,11 @@ export class UserService {
     if (me.isAccountVerified) {
       throw new ForbiddenException('Account already verified');
     }
+    const diff = getDifferenceBetweenDates(new Date(me.verificationInfo.lastOtpSentAt), new Date());
 
+    if (diff.mm <= 1) {
+      throw new ForbiddenException('Otp send less than 1 min ago,\n please wait!');
+    }
     function randomIntFromInterval(min, max) {
       // min and max included
       return Math.floor(Math.random() * (max - min + 1) + min);
