@@ -76,6 +76,16 @@ export class AuthService {
 
   async signup(dto: SignUpDto) {
     // generate hash
+    // *** implementation for unique values on server side
+    const tempVal = dto;
+    Object.keys(tempVal).map((key) => {
+      if (!tempVal[key]) {
+        delete tempVal[key];
+      }
+    });
+    dto = tempVal;
+    console.log({ dto });
+    // *** END
     const hash = await argon.hash(dto.password);
     dto.password = hash;
 
@@ -134,6 +144,7 @@ export class AuthService {
       // return user;
       return this.signToken(user.id, user.mobileNumber);
     } catch (error) {
+      console.log({ error });
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException('Already registerd please login');
