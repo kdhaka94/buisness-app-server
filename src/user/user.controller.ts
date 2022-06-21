@@ -2,7 +2,7 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { MerchantInfoDto } from './dto';
-import { SearchUserDto, ReportUserDto } from './dto/user';
+import { ReportUserDto, SearchUserDto, UpdateUserDto } from './dto/user';
 import { UserService } from './user.service';
 
 @UseGuards(AuthGuard('jwt'))
@@ -34,7 +34,10 @@ export class UserController {
   getPaymentInfo(@Req() { user }: Request) {
     return this.userService.getPaymentInfo(user);
   }
-
+  @Post('updateProfile')
+  updateProfile(@Body() dto: UpdateUserDto, @Req() { user }: Request) {
+    return this.userService.updateUser(dto, user);
+  }
   @Post('me')
   getMe(@Req() { user }: Request) {
     return this.userService.getMe(user);

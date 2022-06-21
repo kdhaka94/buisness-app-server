@@ -1,11 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
-import { delay } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { MerchantInfoDto, ReportUserDto, SearchUserDto } from './dto';
-import { v4 as uuidV4 } from 'uuid';
+import { MerchantInfoDto, ReportUserDto, SearchUserDto, UpdateUserDto } from './dto';
 import { getDifferenceBetweenDates } from './utils/date-time-helper';
 // import { PaytmChecksum } from './paytm/checksum'
 const https = require('https');
@@ -226,6 +223,27 @@ export class UserService {
     }
 
     return me;
+  }
+
+  async updateUser(dto: UpdateUserDto, currentUser: any) {
+    // *** implementation for unique values on server side
+    const tempVal = dto;
+    Object.keys(tempVal).map((key) => {
+      if (!tempVal[key]) {
+        delete tempVal[key];
+      }
+    });
+    dto = tempVal;
+    // *** END
+    const updated = this.prisma.user.update({
+      where: {
+        id: currentUser.sub,
+      },
+      data: {
+        ...dto,
+      },
+    });
+    return updated;
   }
   async verifyMe(otp: string, currentUser: any) {
     const me = await this.prisma.user.findUnique({
