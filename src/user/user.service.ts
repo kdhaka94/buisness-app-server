@@ -234,13 +234,17 @@ export class UserService {
       },
     });
 
-    if (me.verificationInfo.lastOtp != otp) {
+    if ((me?.verificationInfo?.lastOtp || '') != otp) {
       throw new ForbiddenException('OTP did not match');
     }
-    const diff = getDifferenceBetweenDates(new Date(me.verificationInfo.lastOtpSentAt), new Date());
-    console.log({ diff });
-    if (diff.mm > 5) {
-      throw new ForbiddenException('Last otp has expired');
+    if (me?.verificationInfo?.lastOtpSentAt) {
+      const diff = getDifferenceBetweenDates(
+        new Date(me.verificationInfo.lastOtpSentAt),
+        new Date()
+      );
+      if (diff.mm > 5) {
+        throw new ForbiddenException('Last otp has expired');
+      }
     }
 
     const updated = await this.prisma.user.update({
@@ -487,10 +491,15 @@ export class UserService {
     if (me.isAccountVerified) {
       throw new ForbiddenException('Account already verified');
     }
-    const diff = getDifferenceBetweenDates(new Date(me.verificationInfo.lastOtpSentAt), new Date());
+    if (me?.verificationInfo?.lastOtpSentAt) {
+      const diff = getDifferenceBetweenDates(
+        new Date(me?.verificationInfo?.lastOtpSentAt),
+        new Date()
+      );
 
-    if (diff.mm <= 1) {
-      throw new ForbiddenException('Otp send less than 1 min ago,\n please wait!');
+      if (diff.mm <= 1) {
+        throw new ForbiddenException('Otp send less than 1 min ago,\n please wait!');
+      }
     }
     function randomIntFromInterval(min, max) {
       // min and max included
