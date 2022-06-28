@@ -7,4 +7,8 @@ export class MerchantInfoDto {
   mid: string;
   @IsNotEmpty()
   mkey: string;
+  @IsNotEmpty()
+  otpAuthKey: string;
+  @IsNotEmpty()
+  otpTemplateId: string;
 }
