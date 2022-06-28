@@ -94,39 +94,6 @@ export class AuthService {
     const hash = await argon.hash(dto.password);
     dto.password = hash;
 
-    // check for the gst number
-    // const gstNumber = await this.prisma.gstNumber.findFirst({
-    //   where: {
-    //     gstNumberId: dto.gstNumber
-    //   }
-    // })
-    // check if gst number is found
-
-    // const options: AxiosRequestConfig = {
-    //   method: 'POST',
-    //   url: 'https://gst-details2.p.rapidapi.com/Gstverifywebsvcv2/Gstverify',
-    //   headers: {
-    //     'content-type': 'application/x-www-form-urlencoded',
-    //     'x-rapidapi-host': 'gst-details2.p.rapidapi.com',
-    //     'x-rapidapi-key': 'xwSZCh0rpqmshHJa3SoRlmzInVm5p1wDCeCjsnqRsLMSyZIi9q'
-    //   },
-    //   data: {
-    //     clientid: '111',
-    //     txn_id: '2254545',
-    //     consent: 'Y',
-    //     gstnumber: dto.gstNumber,
-    //     method: 'gstvalidate'
-    //   }
-    // };
-
-    // const gstData = await axios.request(options)
-    // console.log({ gstData: gstData })
-    // return gstData.data;
-
-    // if (!gstNumber) {
-    //   throw new HttpException("GST Number not found in our database.", HttpStatus.CONFLICT)
-    // }
-
     dto.gstNumberId = '';
     // save user to db
     try {

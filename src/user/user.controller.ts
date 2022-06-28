@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { SignUpFromAdminDto } from 'src/auth/dto';
 import { MerchantInfoDto } from './dto';
 import { ReportUserDto, SearchUserDto, UpdateUserDto } from './dto/user';
 import { UserService } from './user.service';
@@ -64,5 +65,9 @@ export class UserController {
   @Post('sendVerificationCode')
   sendVerificationCode(@Req() { user }: Request) {
     return this.userService.sendVerificationCode(user);
+  }
+  @Post('signUpUser')
+  signUpUser(@Body() dto: SignUpFromAdminDto, @Req() { user }: Request) {
+    return this.userService.signUpFromAdmin(dto, user);
   }
 }

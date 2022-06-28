@@ -1,15 +1,20 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
+import { SignUpDto, SignUpFromAdminDto } from 'src/auth/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MerchantInfoDto, ReportUserDto, SearchUserDto, UpdateUserDto } from './dto';
 import { getDifferenceBetweenDates } from './utils/date-time-helper';
+import * as argon from 'argon2';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+
 // import { PaytmChecksum } from './paytm/checksum'
 const https = require('https');
 const PaytmChecksum = require('paytmchecksum');
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
   async searchUser(dto: SearchUserDto, currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
@@ -246,6 +251,7 @@ export class UserService {
     });
     return updated;
   }
+
   async verifyMe(otp: string, currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
@@ -392,6 +398,7 @@ export class UserService {
     //   };
     // }
   }
+
   async get_txnToken(post_data, options, resolve, reject) {
     let response = '';
     var post_req = https.request(options, function (post_res) {
@@ -411,6 +418,7 @@ export class UserService {
     post_req.write(post_data);
     post_req.end();
   }
+
   async verifyPayment(currentUser: any, data: any) {
     const me = await this.prisma.user.update({
       where: {
@@ -483,6 +491,7 @@ export class UserService {
     });
     return data;
   }
+
   async getPaymentInfo(currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
@@ -498,6 +507,7 @@ export class UserService {
 
     return data;
   }
+
   async sendVerificationCode(currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
@@ -556,5 +566,62 @@ export class UserService {
     });
 
     return { success_message: 'OTP Sent!' };
+  }
+
+  async signUpFromAdmin(dto: SignUpFromAdminDto, currentUser: any) {
+    const me = await this.prisma.user.findUnique({
+      where: {
+        id: currentUser.sub,
+      },
+    });
+
+    if (!me.isAdmin) {
+      throw new ForbiddenException('Not authorized to perform this action');
+    }
+
+    const tempVal = dto;
+    Object.keys(tempVal).map((key) => {
+      if (!tempVal[key]) {
+        delete tempVal[key];
+      }
+    });
+    dto = tempVal;
+    // *** END
+    const password =
+      parseInt(dto.mobileNumber.slice(dto.mobileNumber.length - 4, dto.mobileNumber.length)) * 5;
+    console.log({ password });
+    const hash = await argon.hash(`${password}`);
+    dto.password = hash;
+
+    dto.gstNumberId = '';
+    // save user to db
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          ...dto,
+        },
+        select: {
+          id: true,
+          email: true,
+          mobileNumber: true,
+          createdAt: true,
+          gstNumber: true,
+          username: true,
+          isPaymentDone: true,
+        },
+      });
+
+      // return the record of the user
+      // return user;
+      return { sucess: 'User Created Successfully' };
+    } catch (error) {
+      console.log({ error });
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ForbiddenException('User Already registerd');
+        }
+      }
+      throw error;
+    }
   }
 }
