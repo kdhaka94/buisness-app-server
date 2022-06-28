@@ -38,6 +38,8 @@ export class AuthService {
         username: true,
         isPaymentDone: true,
         isBlocked: true,
+        isVerifiedByAdmin: true,
+        isAccountVerified: true,
       },
     });
 
@@ -49,6 +51,9 @@ export class AuthService {
 
     if (!pwMatches) {
       throw new ForbiddenException('Credentials incorrect');
+    }
+    if (user.isVerifiedByAdmin) {
+      throw new ForbiddenException('Your account is not verified, contact admin.');
     }
     if (user.isBlocked) {
       throw new ForbiddenException('Your account has been blocked');

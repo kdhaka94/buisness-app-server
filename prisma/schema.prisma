@@ -32,6 +32,7 @@ model User {
   verificationInfo  VerificationInfoType?
   designation       String
   isAdmin           Boolean               @default(false)
+  isVerifiedByAdmin Boolean               @default(false)
   // gstNumber   GstNumber @relation(fields: [gstNumberId], references: [id])
   gstNumber         String?
   panNumber         String?
@@ -83,13 +84,16 @@ model Payment {
 }
 
 model MerchantInfo {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  mid         String
-  mkey        String
-  amount      String
-  websiteName String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  mid           String
+  mkey          String
+  amount        String
+  websiteName   String
+  otpCount      Int      @default(0)
+  otpAuthKey    String   @default("336052A8JalNZv761e70f85P1")
+  otpTemplateId String   @default("1207161600667972200")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
 
   @@map("Merchant")

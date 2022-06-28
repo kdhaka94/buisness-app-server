@@ -137,6 +137,7 @@ export class UserService {
     });
     return updatedUser;
   }
+
   async unblockUser(dto: ReportUserDto, currentUser: any) {
     const me = await this.prisma.user.findUnique({
       where: {
@@ -296,7 +297,7 @@ export class UserService {
         head: {},
       };
 
-      const paymentInfo = await this.prisma.merchantInfo.findFirst({});
+      const paymentInfo = await this.prisma.merchantInfo.findFirst();
 
       paytmParams.body = ((orderId = randomUUID()) => ({
         requestType: 'Payment',
@@ -470,10 +471,11 @@ export class UserService {
     if (!me.isAdmin) {
       throw new ForbiddenException('Not authorized');
     }
+    const admin = await this.prisma.merchantInfo.findFirst();
 
     const data = await this.prisma.merchantInfo.update({
       where: {
-        id: '6277f4898e229524a7d86d44',
+        id: admin.id,
       },
       data: {
         ...info,
@@ -492,11 +494,7 @@ export class UserService {
       throw new ForbiddenException('Not authorized');
     }
 
-    const data = await this.prisma.merchantInfo.findFirst({
-      where: {
-        id: '6277f4898e229524a7d86d44',
-      },
-    });
+    const data = await this.prisma.merchantInfo.findFirst();
 
     return data;
   }
@@ -530,9 +528,20 @@ export class UserService {
       `${code} is your one time password (OTP) for verification at buisnessapp. OTP Count 6 and valid for 5Minutes. Thanks`
     );
 
+    const admin = await this.prisma.merchantInfo.findFirst();
     const response = await axios.get(
-      `https://api.msg91.com/api/sendhttp.php?authkey=336052A8JalNZv761e70f85P1&mobiles=${me.mobileNumber}&message=${codeString}&sender=VHTOTP&route=4&country=91&DLT_TE_ID=1207161600667972200&response=json`
+      `https://api.msg91.com/api/sendhttp.php?authkey=${admin.otpAuthKey}&mobiles=${me.mobileNumber}&message=${codeString}&sender=VHTOTP&route=4&country=91&DLT_TE_ID=${admin.otpTemplateId}&response=json`
     );
+    await this.prisma.merchantInfo.update({
+      where: {
+        id: admin.id,
+      },
+      data: {
+        otpCount: {
+          increment: 1,
+        },
+      },
+    });
 
     const update = await this.prisma.user.update({
       where: {
